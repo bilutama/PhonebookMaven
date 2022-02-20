@@ -9,5 +9,8 @@
         <module name="phonebookservletfull" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="phonebookservletfull" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
