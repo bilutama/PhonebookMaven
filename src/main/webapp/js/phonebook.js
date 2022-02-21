@@ -19,7 +19,7 @@ new Vue({
         lastName: "",
         phone: "",
         rows: [],
-        selectedContacts: [],
+        selectedRowsIds: [],
         serverError: ""
     },
 
@@ -100,6 +100,11 @@ new Vue({
             $.get("/phonebook/get/all").done(response => {
                 const contactListFromServer = JSON.parse(response);
                 this.rows = this.convertContactList(contactListFromServer);
+            }).always(() => {
+                // Recovery previously selected rows
+                const remainedContactsIds = this.rows.map(row => row.id);
+                this.selectedRowsIds = this.selectedRowsIds.filter(id => remainedContactsIds.includes(id));
+                this.rows.forEach(row => row.checked = this.selectedRowsIds.includes(row.id));
             });
         }
     },
@@ -165,6 +170,53 @@ new Vue({
 
     created() {
         this.loadData();
+    },
+
+    watch: {
+        // Updating GeneralCheckBox status and selectedContactIds of selected contacts
+        rows: {
+            deep: true,
+
+            handler() {
+                if (this.rows.length === 0) {
+                    this.isGeneralCheckboxChecked = false;
+                    this.isGeneralCheckBoxIndeterminate = false;
+                    return;
+                }
+                let checkedCount = 0;
+                let uncheckedCount = 0;
+
+                this.rows.forEach(row => {
+                    const currentId = row.id;
+
+                    if (row.checked) {
+                        ++checkedCount;
+
+                        // Update the array with ids for delete
+                        if (!this.selectedRowsIds.includes(currentId)) {
+                            this.selectedRowsIds.push(currentId);
+                        }
+                    } else {
+                        ++uncheckedCount;
+
+                        // Update the array with ids for delete
+                        this.selectedRowsIds = this.selectedRowsIds.filter(id => id !== currentId);
+                    }
+                });
+
+                if (checkedCount > 0 && uncheckedCount > 0) {
+                    this.isGeneralCheckBoxIndeterminate = true;
+                    return;
+                }
+
+                this.isGeneralCheckBoxIndeterminate = false;
+                this.isGeneralCheckboxChecked = checkedCount > 0;
+            }
+        },
+
+        isGeneralCheckboxChecked() {
+            this.rows.forEach(c => c.checked = this.isGeneralCheckboxChecked);
+        }
     }
 });
 

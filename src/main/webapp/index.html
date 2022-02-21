@@ -64,14 +64,14 @@
 
         <div class="filter-container">
             <label class="mr-1">
-                Введите текст:
+                Search:
                 <input type="text" class="form-control input-sm"/>
             </label>
-            <button class="btn btn-primary">Отфильтровать</button>
-            <button class="btn btn-primary">Сбросить фильтр</button>
+            <button class="btn btn-primary">Filter</button>
+            <button class="btn btn-primary">Reset filter</button>
         </div>
 
-        <button type="button" class="btn btn-primary">Удалить выбранные</button>
+        <button type="button" class="btn btn-primary">Delete selected</button>
 
         <table class="table table-responsive table-hover mt-3">
             <thead class="table-light">
@@ -96,7 +96,7 @@
                 <template v-if="row.shown">
                     <td>
                         <label class="select-me-label">
-                            <input type="checkbox" class="select-me">
+                            <input type="checkbox" class="select-me" v-model="row.checked">
                         </label>
                     </td>
                     <td v-text="row.number"></td>
@@ -122,5 +122,32 @@
         </footer>
     </div>
 </div>
+
+<!-- Confirm delete Modal -->
+<div class="modal fade" id="delete_confirmation_modal" tabindex="-1" aria-labelledby="modalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Delete confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                        id="modal-cancel">Cancel
+                </button>
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-dismiss="modal"
+                        id="modal-delete">Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
