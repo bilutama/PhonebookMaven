@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/phonebook.css"/>
     <title>Phonebook on Vue and Servlets</title>
-    <link rel="shortcut icon" href="images/phonebook.svg" type="image/svg" />
+    <link rel="shortcut icon" href="images/phonebook.svg" type="image/svg"/>
 </head>
 
 <body>
@@ -27,90 +27,101 @@
         </div>
     </nav>
 
+
     <div class="container">
-        <form class="form">
-            <div>
-                <label class="form-label">
-                    <span class="form-field">First name:</span>
-                    <input type="text" class="form-control input-sm form-input ml-1"
-                           v-model="firstName"
-                           v-bind:class="{ 'input-error': firstNameError.error && validation }"/>
-                    <span v-show="validation" class="error-message" v-text="firstNameError.message"></span>
-                </label>
+        <!-- START FORM -->
+        <form @submit.prevent="addContact" class="row g-3 border needs-validation mt-3 py-2"
+              :class="{'was-validated': validation}" novalidate>
+            <div class="col-md-4 mt-0">
+                <label for="first_name" class="form-label">First name</label>
+                <input type="text" id="first_name" class="form-control" v-model.trim="firstName"
+                       :class="{ 'input-error': firstNameError.error && validation }" required>
+                <div class="invalid-feedback">
+                    Please provide your name
+                </div>
             </div>
-            <div>
-                <label class="form-label">
-                    <span class="form-field">Second name:</span>
-                    <input type="text" class="form-control input-sm form-input ml-1"
-                           v-model="lastName"
-                           v-bind:class="{ 'input-error': lastNameError.error && validation }"/>
-                    <span v-show="validation" class="error-message" v-text="lastNameError.message"></span>
-                </label>
+            <div class="col-md-4 mt-0">
+                <label for="last_name" class="form-label">Last name</label>
+                <input type="text" id="last_name" class="form-control" v-model.trim="lastName"
+                       :class="{ 'input-error': lastNameError.error && validation }" required>
+                <div class="invalid-feedback">
+                    Please provide your last name
+                </div>
             </div>
-            <div>
-                <label class="form-label">
-                    <span class="form-field">Telephone:</span>
-                    <input type="text" class="form-control input-sm form-input ml-1"
-                           v-model="phone"
-                           v-bind:class="{ 'input-error': phoneError.error && validation }"/>
-                    <span v-show="validation" class="error-message" v-text="phoneError.message"></span>
-                </label>
+            <div class="col-md-4 mt-0">
+                <label for="telephone_number" class="form-label">Telephone</label>
+                <input type="tel" id="telephone_number" class="form-control" v-model.trim="phone"
+                       :class="{ 'input-error': phoneError.error && validation }" required>
+                <div class="invalid-feedback">
+                    You have to enter phone number
+                </div>
             </div>
-            <button type="button" class="btn btn-primary" v-on:click="addContact">Add new contact</button>
+            <div class="col mt-3">
+                <button class="btn btn-primary my-1">Add contact</button>
+                <button class="btn btn-danger my-1" type="button" @click="showConfirmDeleteDialog(null)">Delete selected
+                </button>
+                <button @click.prevent="clearForm" class="btn btn-secondary my-1" type="button">Clear form</button>
+            </div>
         </form>
+        <!-- END FORM -->
 
-        <div class="delete-dialog"></div>
-        <div class="alert" title="Нет выбранных контактов"></div>
-
-        <div class="filter-container">
-            <label class="mr-1">
-                Search:
-                <input type="text" class="form-control input-sm"/>
-            </label>
-            <button class="btn btn-primary">Filter</button>
-            <button class="btn btn-primary">Reset filter</button>
+        <!-- START SEARCH PANEL -->
+        <div class="row justify-content-center">
+            <form @submit.prevent class="g-3 col-md-6 col-12 border mt-3 py-3" novalidate id="search_form">
+                <div class="input-group">
+                    <button @click.prevent="resetFilter" class="btn btn-outline-secondary" type="button">Reset</button>
+                    <input type="text" class="form-control mx-2" placeholder="Type to search" aria-label="Search panel"
+                           v-model.trim="term">
+                    <button @click.prevent="loadData(term)" class="btn btn-primary" type="button">Search</button>
+                </div>
+            </form>
         </div>
+        <!-- END SEARCH PANEL -->
 
-        <button @click="deleteContacts(selectedRowsIds)" type="button" class="btn btn-primary">Delete selected</button>
-
-        <table class="table table-responsive table-hover mt-3">
-            <thead class="table-light">
-            <tr>
-                <th class="align-middle">
-                    <div class="form-check">
-                        <input type="checkbox"
-                               v-model="isGeneralCheckboxChecked"
-                               v-indeterminate="isGeneralCheckBoxIndeterminate"
-                               :disabled="rows.length === 0">
-                    </div>
-                </th>
-                <th class="align-middle" scope="col">#</th>
-                <th class="align-middle" scope="col">First Name</th>
-                <th class="align-middle" scope="col">Last Name</th>
-                <th class="align-middle" scope="col">Phone number</th>
-                <th class="align-middle" scope="col"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-cloak v-for="row in rows">
-                <template v-if="row.shown">
-                    <td>
-                        <label class="select-me-label">
-                            <input type="checkbox" class="select-me" v-model="row.checked">
+        <!-- START CONTENT TABLE -->
+        <div class="table-responsive">
+            <table v-cloak class="table table-hover mt-3">
+                <thead class="table-light">
+                <tr>
+                    <th class="align-middle">
+                        <label class="select-all-label">
+                            <input class="select-all"
+                                   type="checkbox"
+                                   v-model="isGeneralCheckboxChecked"
+                                   v-indeterminate="isGeneralCheckBoxIndeterminate"
+                                   :disabled="rows.length === 0">
                         </label>
-                    </td>
-                    <td v-text="row.number"></td>
-                    <td v-text="row.firstName"></td>
-                    <td v-text="row.lastName"></td>
-                    <td v-text="row.phone"></td>
-                    <td>
-                        <button @click="deleteContacts([row.id])" type="button" class="btn-outline-danger" aria-label="Delete">Delete</button>
-                    </td>
-                </template>
-            </tr>
-            </tbody>
-        </table>
-        <br>
+                    </th>
+                    <th class="align-middle" scope="col">#</th>
+                    <th class="align-middle" scope="col">First Name</th>
+                    <th class="align-middle" scope="col">Last Name</th>
+                    <th class="align-middle" scope="col">Phone number</th>
+                    <th class="align-middle" scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="row in rows">
+                    <template v-if="row.shown">
+                        <td>
+                            <label class="select-me-label">
+                                <input type="checkbox" class="select-me" v-model="row.checked">
+                            </label>
+                        </td>
+                        <td>{{ row.number }}</td>
+                        <td>{{ row.firstName }}</td>
+                        <td>{{ row.lastName }}</td>
+                        <td>{{ row.phone }}</td>
+                        <td>
+                            <button @click="showConfirmDeleteDialog(row)" type="button" class="btn btn-outline-danger"
+                                    aria-label="Delete">Delete
+                            </button>
+                        </td>
+                    </template>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- END CONTENT TABLE -->
 
         <div class="server-error-message-container">
             <span v-show="serverValidation" v-text="serverError"></span>
@@ -121,34 +132,33 @@
             </div>
         </footer>
     </div>
-</div>
 
-<!-- Confirm delete Modal -->
-<div class="modal fade" ref="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Delete confirmation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body"></div>
-                <span v-text="confirmDeleteModalMessage"></span>
-            <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
-                        id="modal-cancel">Cancel
-                </button>
-                <button type="button"
-                        class="btn btn-danger"
-                        data-bs-dismiss="modal"
-                        id="modal-delete">Delete
-                </button>
+    <!-- Confirm delete Modal -->
+    <div class="modal fade" id="delete_confirmation_modal" tabindex="-1" aria-labelledby="modalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Delete confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">{{ confirmDeleteModalMessage }}</div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                            id="modal-cancel">Cancel
+                    </button>
+                    <button type="button"
+                            @click="confirmDelete(contactIdsForDelete)"
+                            class="btn btn-danger"
+                            data-bs-dismiss="modal"
+                            id="modal-delete">Delete
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 </body>
 </html>

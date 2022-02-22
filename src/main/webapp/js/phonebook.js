@@ -1,3 +1,5 @@
+//import {Modal} from "/js/libs/bootstrap.js";
+
 function Contact(firstName, lastName, phone) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -15,6 +17,7 @@ new Vue({
 
         contactForDelete: null,
         contactFullName: "",
+        contactIdsForDelete: [],
 
         validation: false,
         serverValidation: false,
@@ -23,7 +26,9 @@ new Vue({
         phone: "",
         rows: [],
         selectedRowsIds: [],
-        serverError: ""
+        serverError: "",
+
+        term: ""
     },
 
     directives: {
@@ -56,6 +61,19 @@ new Vue({
             });
         },
 
+        clearForm() {
+            this.firstName = "";
+            this.lastName = "";
+            this.phone = "";
+
+            this.validation = false;
+        },
+
+        resetFilter() {
+            this.term = "";
+            this.loadData();
+        },
+
         addContact() {
             if (this.hasError) {
                 this.validation = true;
@@ -86,18 +104,20 @@ new Vue({
         },
 
         showConfirmDeleteDialog(contact) {
+            this.contactForDelete = null;
+
             if (contact === null && this.selectedRowsIds.length === 0) {
                 return;
             }
 
-            const contactIdsForDelete = contact === null ? this.selectedRowsIds : [contact.id];
+            this.contactIdsForDelete = contact === null ? this.selectedRowsIds : [contact.id];
 
             // _contactForDelete_ is used to pass contact data to modal dialog
             // _contactForDelete_ is passed when contact deleted with x button or
             // when only one contact is selected with checkbox
             if (contact === null) {
-                if (contactIdsForDelete.length === 1) {
-                    this.contactForDelete = this.rows.filter(row => row.id === contactIdsForDelete[0])[0];
+                if (this.contactIdsForDelete.length === 1) {
+                    this.contactForDelete = this.rows.filter(row => row.id === this.contactIdsForDelete[0])[0];
                 } else {
                     this.contactForDelete = null; // Set to null if _contactForDelete_ was set previously and not updated
                 }
@@ -105,35 +125,20 @@ new Vue({
                 this.contactForDelete = contact;
             }
 
-            const contactForDeleteFullName = this.contactForDelete === null ? "" : this.contactForDelete.firstName + " " + this.contactForDelete.lastName;
-
-            this.$refs.confirmDeleteModal.show(contactForDeleteFullName, () => {
-                $.ajax({
-                    type: "POST",
-                    url: "/phonebook/delete",
-                    data: JSON.stringify(contactsIds)
-                }).done(() => {
-                    this.serverValidation = false;
-
-                    this.contactForDelete = null;
-                    // Clear selectedRowsIds array from contacts ids that were deleted
-                    this.selectedRowsIds = this.selectedRowsIds.filter(deletedContactId => !contactIdsForDelete.includes(deletedContactId));
-                    this.getContacts(this.term);
-                }).fail(ajaxRequest => {
-                    console.log(ajaxRequest);
-                }).always(() => {
-                    this.loadData();
-                });
-            });
+            new bootstrap.Modal($("#delete_confirmation_modal"), {}).show();
         },
 
-        deleteContacts(contactsIds) {
+        confirmDelete(contactIds) {
             $.ajax({
                 type: "POST",
                 url: "/phonebook/delete",
-                data: JSON.stringify(contactsIds)
+                data: JSON.stringify(contactIds)
             }).done(() => {
                 this.serverValidation = false;
+
+                this.contactForDelete = null;
+                // Clear selectedRowsIds array from contacts ids that were deleted
+                this.selectedRowsIds = this.selectedRowsIds.filter(deletedContactId => !this.contactIdsForDelete.includes(deletedContactId));
             }).fail(ajaxRequest => {
                 console.log(ajaxRequest);
             }).always(() => {
@@ -141,7 +146,7 @@ new Vue({
             });
         },
 
-        loadData() {
+        loadData(term) {
             $.get("/phonebook/get/all").done(response => {
                 const contactListFromServer = JSON.parse(response);
                 this.rows = this.convertContactList(contactListFromServer);
@@ -164,7 +169,7 @@ new Vue({
             }
 
             return {
-                message: "Поле Имя должно быть заполнено.",
+                message: "Please provide your first name",
                 error: true
             };
         },
@@ -172,7 +177,7 @@ new Vue({
         lastNameError() {
             if (!this.lastName) {
                 return {
-                    message: "Поле Фамилия должно быть заполнено.",
+                    message: "Please provide your last name",
                     error: true
                 };
             }
@@ -213,7 +218,9 @@ new Vue({
         },
 
         confirmDeleteModalMessage() {
-            return this.contactFullName === "" ? "Delete selected contacts?" : "Delete contact " + this.contactFullName + "?";
+            return this.contactForDelete === null ?
+                "Delete selected contacts?" :
+                "Delete contact " + this.contactForDelete.firstName + " " + this.contactForDelete.lastName + "?";
         }
     },
 
