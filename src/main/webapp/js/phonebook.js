@@ -13,6 +13,9 @@ new Vue({
         isGeneralCheckboxChecked: false,
         isGeneralCheckBoxIndeterminate: false,
 
+        contactForDelete: null,
+        contactFullName: "",
+
         validation: false,
         serverValidation: false,
         firstName: "",
@@ -80,6 +83,48 @@ new Vue({
             this.lastName = "";
             this.phone = "";
             this.validation = false;
+        },
+
+        showConfirmDeleteDialog(contact) {
+            if (contact === null && this.selectedRowsIds.length === 0) {
+                return;
+            }
+
+            const contactIdsForDelete = contact === null ? this.selectedRowsIds : [contact.id];
+
+            // _contactForDelete_ is used to pass contact data to modal dialog
+            // _contactForDelete_ is passed when contact deleted with x button or
+            // when only one contact is selected with checkbox
+            if (contact === null) {
+                if (contactIdsForDelete.length === 1) {
+                    this.contactForDelete = this.rows.filter(row => row.id === contactIdsForDelete[0])[0];
+                } else {
+                    this.contactForDelete = null; // Set to null if _contactForDelete_ was set previously and not updated
+                }
+            } else {
+                this.contactForDelete = contact;
+            }
+
+            const contactForDeleteFullName = this.contactForDelete === null ? "" : this.contactForDelete.firstName + " " + this.contactForDelete.lastName;
+
+            this.$refs.confirmDeleteModal.show(contactForDeleteFullName, () => {
+                $.ajax({
+                    type: "POST",
+                    url: "/phonebook/delete",
+                    data: JSON.stringify(contactsIds)
+                }).done(() => {
+                    this.serverValidation = false;
+
+                    this.contactForDelete = null;
+                    // Clear selectedRowsIds array from contacts ids that were deleted
+                    this.selectedRowsIds = this.selectedRowsIds.filter(deletedContactId => !contactIdsForDelete.includes(deletedContactId));
+                    this.getContacts(this.term);
+                }).fail(ajaxRequest => {
+                    console.log(ajaxRequest);
+                }).always(() => {
+                    this.loadData();
+                });
+            });
         },
 
         deleteContacts(contactsIds) {
@@ -165,6 +210,10 @@ new Vue({
 
         hasError() {
             return this.lastNameError.error || this.firstNameError.error || this.phoneError.error;
+        },
+
+        confirmDeleteModalMessage() {
+            return this.contactFullName === "" ? "Delete selected contacts?" : "Delete contact " + this.contactFullName + "?";
         }
     },
 
@@ -173,7 +222,7 @@ new Vue({
     },
 
     watch: {
-        // Updating GeneralCheckBox status and selectedContactIds of selected contacts
+        // Updating GeneralCheckBox status and selectedRowsIds of selected contacts
         rows: {
             deep: true,
 

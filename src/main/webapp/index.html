@@ -31,7 +31,7 @@
         <form class="form">
             <div>
                 <label class="form-label">
-                    <span class="form-field">Имя:</span>
+                    <span class="form-field">First name:</span>
                     <input type="text" class="form-control input-sm form-input ml-1"
                            v-model="firstName"
                            v-bind:class="{ 'input-error': firstNameError.error && validation }"/>
@@ -40,7 +40,7 @@
             </div>
             <div>
                 <label class="form-label">
-                    <span class="form-field">Фамилия:</span>
+                    <span class="form-field">Second name:</span>
                     <input type="text" class="form-control input-sm form-input ml-1"
                            v-model="lastName"
                            v-bind:class="{ 'input-error': lastNameError.error && validation }"/>
@@ -49,14 +49,14 @@
             </div>
             <div>
                 <label class="form-label">
-                    <span class="form-field">Телефон:</span>
+                    <span class="form-field">Telephone:</span>
                     <input type="text" class="form-control input-sm form-input ml-1"
                            v-model="phone"
                            v-bind:class="{ 'input-error': phoneError.error && validation }"/>
                     <span v-show="validation" class="error-message" v-text="phoneError.message"></span>
                 </label>
             </div>
-            <button type="button" class="btn btn-primary" v-on:click="addContact">Добавить</button>
+            <button type="button" class="btn btn-primary" v-on:click="addContact">Add new contact</button>
         </form>
 
         <div class="delete-dialog"></div>
@@ -124,7 +124,7 @@
 </div>
 
 <!-- Confirm delete Modal -->
-<div class="modal fade" id="delete_confirmation_modal" tabindex="-1" aria-labelledby="modalLabel"
+<div class="modal fade" ref="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -133,6 +133,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body"></div>
+                <span v-text="confirmDeleteModalMessage"></span>
             <div class="modal-footer">
                 <button type="button"
                         class="btn btn-secondary"
