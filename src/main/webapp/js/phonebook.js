@@ -1,5 +1,3 @@
-//import {Modal} from "/js/libs/bootstrap.js";
-
 function Contact(firstName, lastName, phone) {
     this.firstName = firstName;
     this.lastName = lastName;
