@@ -153,9 +153,15 @@ new Vue({
         },
 
         loadData(term) {
-            $.get("/phonebook/get/all").done(response => {
+            $.ajax({
+                type: "POST",
+                url: "/phonebook/get",
+                data: term === null ? "" : JSON.stringify(term)
+            }).done(response => {
                 const contactListFromServer = JSON.parse(response);
                 this.rows = this.convertContactList(contactListFromServer);
+            }).fail(ajaxRequest => {
+                console.log(ajaxRequest.message);
             }).always(() => {
                 // Recovery previously selected rows
                 const remainedContactsIds = this.rows.map(row => row.id);
