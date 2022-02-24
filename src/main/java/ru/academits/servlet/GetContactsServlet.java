@@ -21,9 +21,26 @@ public class GetContactsServlet extends HttpServlet {
     private final ContactService phoneBookService = PhoneBook.phoneBookService;
     private final ContactConverter contactConverter = PhoneBook.contactConverter;
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            String termJson = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            Gson gson = new Gson();
+            Type termJsonType = new TypeToken<String>() {}.getType();
+            String term = gson.fromJson(termJson, termJsonType);
+
             List<Contact> contactList = phoneBookService.getAllContacts();
+
+            // Filter contacts if term is passed
+            if (term != null) {
+                String finalTerm = term.toLowerCase(Locale.ROOT);
+
+                contactList = contactList.stream()
+                        .filter(c -> c.getFirstName().toLowerCase(Locale.ROOT).contains(finalTerm) ||
+                                c.getLastName().toLowerCase(Locale.ROOT).contains(finalTerm) ||
+                                c.getPhone().toLowerCase(Locale.ROOT).contains(finalTerm))
+                        .collect(Collectors.toList());
+            }
+
             String contactListJson = contactConverter.convertToJson(contactList);
 
             // Set the default response content type and encoding
@@ -33,36 +50,6 @@ public class GetContactsServlet extends HttpServlet {
             resp.getOutputStream().write(contactListJson.getBytes(StandardCharsets.UTF_8));
             resp.getOutputStream().flush();
             resp.getOutputStream().close();
-        } catch (Exception e) {
-            System.out.println("error in GetContactsServlet GET: ");
-            e.printStackTrace();
-        }
-    }
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        try (OutputStream responseStream = resp.getOutputStream()) {
-            String termJson = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            Gson gson = new Gson();
-            Type termJsonType = new TypeToken<String>() {
-            }.getType();
-
-            String term = gson.fromJson(termJson, termJsonType);
-
-            String finalTerm = term.toLowerCase(Locale.ROOT);
-            List<Contact> filteredContactList = phoneBookService.getAllContacts();
-//                    .stream()
-//                    .filter(c -> c.getFirstName().toLowerCase(Locale.ROOT).contains(finalTerm) ||
-//                            c.getLastName().toLowerCase(Locale.ROOT).contains(finalTerm) ||
-//                            c.getPhone().toLowerCase(Locale.ROOT).contains(finalTerm))
-//                    .collect(Collectors.toList());
-            String filteredContactListJson = contactConverter.convertToJson(filteredContactList);
-
-            // Set the default response content type and encoding
-            resp.setContentType("text/html; charset=UTF-8");
-            resp.setCharacterEncoding("UTF-8");
-
-            responseStream.write(filteredContactListJson.getBytes(StandardCharsets.UTF_8));
-            responseStream.flush();
         } catch (Exception e) {
             System.out.println("error in GetContactsServlet POST: ");
             e.printStackTrace();

@@ -148,7 +148,7 @@ new Vue({
             }).fail(ajaxRequest => {
                 console.log(ajaxRequest);
             }).always(() => {
-                this.loadData();
+                this.loadData(this.term);
             });
         },
 
