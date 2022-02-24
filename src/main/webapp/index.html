@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script defer src="js/libs/jquery.js"></script>
-    <script defer src="js/libs/bootstrap_5.1.3.js"></script>
+    <script defer src="js/libs/bootstrap.js"></script>
     <script defer src="js/libs/vue.js"></script>
     <script defer src="js/phonebook.js"></script>
 
-    <link rel="stylesheet" href="css/bootstrap_5.1.3.css"/>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
     <link rel="stylesheet" href="css/phonebook.css"/>
     <title>Phonebook on Vue and Servlets</title>
     <link rel="shortcut icon" href="images/phonebook.svg" type="image/svg"/>
@@ -82,25 +82,25 @@
         <div class="table-responsive">
             <table v-cloak class="table table-hover mt-3">
                 <thead class="table-light">
-                <tr>
-                    <th class="align-middle">
-                        <label class="select-all-label">
-                            <input class="select-all"
+                <tr class="align-middle">
+                    <th>
+                        <label class="select-me-label">
+                            <input class="select-me"
                                    type="checkbox"
                                    v-model="isGeneralCheckboxChecked"
                                    v-indeterminate="isGeneralCheckBoxIndeterminate"
                                    :disabled="rows.length === 0">
                         </label>
                     </th>
-                    <th class="align-middle" scope="col">#</th>
-                    <th class="align-middle" scope="col">First Name</th>
-                    <th class="align-middle" scope="col">Last Name</th>
-                    <th class="align-middle" scope="col">Phone number</th>
-                    <th class="align-middle" scope="col"></th>
+                    <th scope="col">#</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Phone number</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="row in rows">
+                <tr class="align-middle" v-for="row in rows">
                     <template v-if="row.shown">
                         <td>
                             <label class="select-me-label">
@@ -112,9 +112,10 @@
                         <td>{{ row.lastName }}</td>
                         <td>{{ row.phone }}</td>
                         <td>
-                            <button @click="showConfirmDeleteDialog(row)" type="button" class="btn btn-outline-danger"
-                                    aria-label="Delete">Delete
-                            </button>
+                            <button @click="showConfirmDeleteDialog(row)"
+                                    type="button"
+                                    class="btn-close"
+                                    aria-label="Delete"></button>
                         </td>
                     </template>
                 </tr>

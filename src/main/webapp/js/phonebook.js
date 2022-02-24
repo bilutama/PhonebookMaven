@@ -36,15 +36,6 @@ new Vue({
     },
 
     methods: {
-        contactToString(contact) {
-            let note = "(";
-            note += contact.firstName + ", ";
-            note += contact.lastName + ", ";
-            note += contact.phone;
-            note += ")";
-            return note;
-        },
-
         convertContactList(contactListFromServer) {
             return contactListFromServer.map((contact, i) => {
                 return {
@@ -72,6 +63,19 @@ new Vue({
             this.loadData();
         },
 
+        formatString(string, isCapitalized) {
+            const separator = " ";
+            const stringsArray = string.trim().toLowerCase().split(separator);
+
+            if (isCapitalized) {
+                for (let i = 0; i < stringsArray.length; ++i) {
+                    stringsArray[i] = stringsArray[i].charAt(0).toUpperCase() + stringsArray[i].slice(1);
+                }
+            }
+
+            return stringsArray.join(separator);
+        },
+
         addContact() {
             if (this.hasError) {
                 this.validation = true;
@@ -79,7 +83,11 @@ new Vue({
                 return;
             }
 
-            const contact = new Contact(this.firstName, this.lastName, this.phone);
+            const contact = new Contact(
+                this.formatString(this.firstName, true),
+                this.formatString(this.lastName, true),
+                this.formatString(this.phone, false)
+            );
 
             $.ajax({
                 type: "POST",
