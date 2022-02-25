@@ -152,6 +152,24 @@ new Vue({
             });
         },
 
+        exportContacts() {
+            $.ajax({
+                type: "POST",
+                url: "/phonebook/get",
+                data: term === null ? "" : JSON.stringify(term)
+            }).done(response => {
+                const contactListFromServer = JSON.parse(response);
+                this.rows = this.convertContactList(contactListFromServer);
+            }).fail(ajaxRequest => {
+                console.log(ajaxRequest.message);
+            }).always(() => {
+                // Recovery previously selected rows
+                const remainedContactsIds = this.rows.map(row => row.id);
+                this.selectedRowsIds = this.selectedRowsIds.filter(id => remainedContactsIds.includes(id));
+                this.rows.forEach(row => row.checked = this.selectedRowsIds.includes(row.id));
+            });
+        },
+
         loadData(term) {
             $.ajax({
                 type: "POST",

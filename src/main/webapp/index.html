@@ -65,9 +65,13 @@
         </form>
         <!-- END FORM -->
 
+        <div class="input-group mt-3 justify-content-center">
+            <button @click.prevent="exportContacts" class="btn btn-outline-secondary" type="button">Export contacts to .xlsx</button>
+        </div>
+
         <!-- START SEARCH PANEL -->
         <div class="row justify-content-center">
-            <form @submit.prevent class="g-3 col-md-6 col-12 border mt-3 py-3" novalidate id="search_form">
+            <form @submit.prevent class="g-3 col-md-8 col-12 border mt-3 py-3" novalidate id="search_form">
                 <div class="input-group">
                     <button @click.prevent="resetFilter" class="btn btn-outline-secondary" type="button">Reset</button>
                     <input type="text" class="form-control" placeholder="Type to search" aria-label="Search panel"
