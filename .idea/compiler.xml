@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="phonebookservletfull" />
+        <module name="PhonebookMaven" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="phonebookservletfull" target="8" />
+      <module name="PhonebookMaven" target="8" />
+      <module name="phonebookservlets" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

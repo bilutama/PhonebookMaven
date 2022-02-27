@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/phonebookservletfull.iml" filepath="$PROJECT_DIR$/phonebookservletfull.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PhonebookMaven.iml" filepath="$PROJECT_DIR$/PhonebookMaven.iml" />
     </modules>
   </component>
 </project>

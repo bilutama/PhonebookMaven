@@ -153,21 +153,36 @@ new Vue({
         },
 
         exportContacts() {
-            $.ajax({
-                type: "POST",
-                url: "/phonebook/get",
-                data: term === null ? "" : JSON.stringify(term)
-            }).done(response => {
-                const contactListFromServer = JSON.parse(response);
-                this.rows = this.convertContactList(contactListFromServer);
-            }).fail(ajaxRequest => {
-                console.log(ajaxRequest.message);
-            }).always(() => {
-                // Recovery previously selected rows
-                const remainedContactsIds = this.rows.map(row => row.id);
-                this.selectedRowsIds = this.selectedRowsIds.filter(id => remainedContactsIds.includes(id));
-                this.rows.forEach(row => row.checked = this.selectedRowsIds.includes(row.id));
-            });
+            var req = new XMLHttpRequest();
+            req.open("GET", "/file.pdf", true);
+            req.responseType = "blob";
+
+            req.onload = function (event) {
+                const blob = req.response;
+                console.log(blob.size);
+                var link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "phonebook_" + new Date() + ".xlsx";
+                link.click();
+            };
+
+            req.send();
+
+            // $.ajax({
+            //     dataType: "native",
+            //     url: "/phonebook/export",
+            //     xhrFields: {
+            //         responseType: "blob"
+            //     }
+            // }).done(blob => {
+            //     console.log(blob.size);
+            //     const link = document.createElement("a");
+            //     link.href = window.URL.createObjectURL(blob);
+            //     link.download = "phonebook_" + new Date() + ".xlsx";
+            //     link.click();
+            // }).fail(()=>{
+            //     console.log("Error getting file");
+            // });
         },
 
         loadData(term) {

@@ -1,0 +1,34 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="PhonebookMaven:war exploded">
+    <output-path>$PROJECT_DIR$/target/PhonebookMaven</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>PhonebookMaven</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="PhonebookMaven" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.9.0" />
+          <element id="library" level="project" name="Maven: org.apache.tomcat:servlet-api:6.0.53" />
+          <element id="library" level="project" name="Maven: org.apache.servicemix.bundles:org.apache.servicemix.bundles.poi:4.1.2_1" />
+          <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:1.05" />
+          <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:sources:1.05" />
+          <element id="library" level="project" name="Maven: org.apache.xmlbeans:xmlbeans:5.0.3" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.17.1" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-collections4:4.4" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-compress:1.21" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/PhonebookMaven/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="PhonebookMaven/web/Web" />
+    </root>
+  </artifact>
+</component>

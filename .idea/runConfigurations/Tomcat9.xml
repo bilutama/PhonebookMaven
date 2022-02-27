@@ -3,7 +3,7 @@
     <option name="BROWSER_ID" value="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
     <option name="UPDATING_POLICY" value="restart-server" />
     <deployment>
-      <artifact name="phonebook">
+      <artifact name="phonebookservlets">
         <settings>
           <option name="CONTEXT_PATH" value="/" />
         </settings>
@@ -83,7 +83,7 @@
     <method v="2">
       <option name="Make" enabled="true" />
       <option name="BuildArtifacts" enabled="true">
-        <artifact name="phonebook" />
+        <artifact name="phonebookservlets" />
       </option>
     </method>
   </configuration>
