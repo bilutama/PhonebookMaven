@@ -8,17 +8,20 @@ import ru.academits.service.ContactService;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 
 public class ExportContactsServlet extends HttpServlet {
     private final ContactService phoneBookService = PhoneBook.phoneBookService;
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        try {
+        try (OutputStream outputStream = resp.getOutputStream()) {
             resp.setContentType("application/vnd.ms-excel");
-            resp.setHeader("Content-Disposition", "inline; filename=phonebook.xls");
+            resp.setHeader("Content-Disposition", "attachment; filename=phonebook.xls");
+
             Workbook workbook = createExcel();
-            workbook.write(resp.getOutputStream());
-            resp.getOutputStream().flush();
+            workbook.write(outputStream);
+
+            outputStream.flush();
         } catch (Exception e) {
             System.out.println("error in GetContactsServlet POST: ");
             e.printStackTrace();
