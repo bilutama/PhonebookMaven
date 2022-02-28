@@ -39,7 +39,7 @@ public class Contact {
         this.phone = phone;
     }
 
-    public boolean isImportant() {
+    public boolean getImportant() {
         return important;
     }
 

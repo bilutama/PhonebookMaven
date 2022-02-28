@@ -21,6 +21,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>ToggleImportanceServlet</servlet-name>
+        <servlet-class>ru.academits.servlet.ToggleContactImportance</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ExportContactsServlet</servlet-name>
         <servlet-class>ru.academits.servlet.ExportContactsServlet</servlet-class>
     </servlet>
@@ -38,6 +43,11 @@
     <servlet-mapping>
         <servlet-name>DeleteContactsServlet</servlet-name>
         <url-pattern>/phonebook/delete</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ToggleImportanceServlet</servlet-name>
+        <url-pattern>/phonebook/toggleimportance</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

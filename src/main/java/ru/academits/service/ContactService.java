@@ -29,25 +29,25 @@ public class ContactService {
 
         if (contact.getFirstName().isEmpty()) {
             contactValidation.setValid(false);
-            contactValidation.setErrorMessage("Поле Имя должно быть заполнено.");
+            contactValidation.setErrorMessage("First name is requred");
             return contactValidation;
         }
 
         if (contact.getLastName().isEmpty()) {
             contactValidation.setValid(false);
-            contactValidation.setErrorMessage("Поле Фамилия должно быть заполнено.");
+            contactValidation.setErrorMessage("Last name is required");
             return contactValidation;
         }
 
         if (contact.getPhone().isEmpty()) {
             contactValidation.setValid(false);
-            contactValidation.setErrorMessage("Поле Телефон должно быть заполнено.");
+            contactValidation.setErrorMessage("Phone is required");
             return contactValidation;
         }
 
         if (isExistContactWithPhone(contact.getPhone())) {
             contactValidation.setValid(false);
-            contactValidation.setErrorMessage("Номер телефона не должен дублировать другие номера в телефонной книге.");
+            contactValidation.setErrorMessage("Phone should not duplicate existing ones");
             return contactValidation;
         }
 
@@ -62,6 +62,10 @@ public class ContactService {
         }
 
         return contactValidation;
+    }
+
+    public boolean toggleImportant(int contactId) {
+        return contactDao.toggleImportant(contactId);
     }
 
     public List<Contact> getAllContacts() {

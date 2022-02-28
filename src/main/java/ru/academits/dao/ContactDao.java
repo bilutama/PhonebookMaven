@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by Anna on 17.06.2017.
+ * Modified by Maxim Biluta
  */
 public class ContactDao {
     private List<Contact> contactList = new ArrayList<>();
@@ -18,9 +19,10 @@ public class ContactDao {
         Contact contact = new Contact();
 
         contact.setId(getNewId());
-        contact.setFirstName("Иван");
-        contact.setLastName("Иванов");
+        contact.setFirstName("John");
+        contact.setLastName("Smith");
         contact.setPhone("9123456789");
+        contact.setImportant(true);
 
         contactList.add(contact);
     }
@@ -43,5 +45,20 @@ public class ContactDao {
                 .stream()
                 .filter(c -> !contactsIds.contains(c.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public boolean toggleImportant(int contactId) {
+        Contact contact = contactList
+                .stream()
+                .filter(c -> c.getId() == contactId)
+                .findAny()
+                .orElse(null);
+
+        if (contact == null) {
+            return false;
+        }
+
+        contact.setImportant(!contact.getImportant());
+        return true;
     }
 }

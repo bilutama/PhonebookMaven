@@ -56,6 +56,11 @@
                     You have to enter phone number
                 </div>
             </div>
+            <div class="form-check form-switch mx-2">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                       v-model="important">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Set as important</label>
+            </div>
             <div class="col mt-3">
                 <button class="btn btn-primary my-1">Add contact</button>
                 <button class="btn btn-danger my-1" type="button" @click="showConfirmDeleteDialog(null)">Delete selected
@@ -66,7 +71,9 @@
         <!-- END FORM -->
 
         <div class="input-group mt-3 justify-content-center">
-            <button @click.prevent="exportContacts" class="btn btn-outline-secondary" type="button">Export contacts to .xlsx</button>
+            <button @click.prevent="exportContacts" class="btn btn-outline-secondary" type="button">Export contacts to
+                .xlsx
+            </button>
         </div>
 
         <!-- START SEARCH PANEL -->
@@ -100,6 +107,7 @@
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
                     <th scope="col">Phone number</th>
+                    <th scope="col">Important</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
@@ -115,6 +123,15 @@
                         <td>{{ row.firstName }}</td>
                         <td>{{ row.lastName }}</td>
                         <td>{{ row.phone }}</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       role="switch"
+                                       v-model="row.important"
+                                       @click="toggleImportant(row.id)">
+                            </div>
+                        </td>
                         <td>
                             <button @click="showConfirmDeleteDialog(row)"
                                     type="button"
@@ -159,6 +176,30 @@
                             class="btn btn-danger"
                             data-bs-dismiss="modal"
                             id="modal-delete">Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone exists Modal -->
+    <div class="modal fade" id="telephone_exists_modal" tabindex="-1"
+         aria-labelledby="modalTelephoneExistsLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTelephoneExistsLabel">Cannot add the contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Telephone already exists in the phonebook.
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-warning"
+                            data-bs-dismiss="modal"
+                            id="modal-dismiss">Dismiss
                     </button>
                 </div>
             </div>

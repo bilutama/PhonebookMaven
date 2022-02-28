@@ -3,7 +3,6 @@ package ru.academits.servlet;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import ru.academits.PhoneBook;
-import ru.academits.model.Contact;
 import ru.academits.service.ContactService;
 
 import javax.servlet.http.HttpServlet;
@@ -16,9 +15,10 @@ public class ExportContactsServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             resp.setContentType("application/vnd.ms-excel");
-            resp.setHeader("Content-Disposition", "attachment; filename=SampleExcel.xlsx");
+            resp.setHeader("Content-Disposition", "inline; filename=phonebook.xls");
             Workbook workbook = createExcel();
             workbook.write(resp.getOutputStream());
+            resp.getOutputStream().flush();
         } catch (Exception e) {
             System.out.println("error in GetContactsServlet POST: ");
             e.printStackTrace();
@@ -27,14 +27,12 @@ public class ExportContactsServlet extends HttpServlet {
 
     private Workbook createExcel() {
         Workbook workbook = new XSSFWorkbook();
-        Sheet worksheet = workbook.createSheet("My First POI Worksheet");
+        Sheet worksheet = workbook.createSheet("Worksheet");
 
         Row row1 = worksheet.createRow(0);
 
         Cell cellA1 = row1.createCell(0);
-        cellA1.setCellValue("Hurray! You did it.");
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellA1.setCellStyle(cellStyle);
+        cellA1.setCellValue("TEST DATA");
 
         return workbook;
     }

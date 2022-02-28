@@ -1,7 +1,8 @@
-function Contact(firstName, lastName, phone) {
+function Contact(firstName, lastName, phone, important) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.phone = phone;
+    this.important = important;
     this.checked = false;
     this.shown = true;
 }
@@ -22,6 +23,8 @@ new Vue({
         firstName: "",
         lastName: "",
         phone: "",
+        important: false,
+
         rows: [],
         selectedRowsIds: [],
         serverError: "",
@@ -39,13 +42,14 @@ new Vue({
         convertContactList(contactListFromServer) {
             return contactListFromServer.map((contact, i) => {
                 return {
+                    number: i + 1,
                     id: contact.id,
                     firstName: contact.firstName,
                     lastName: contact.lastName,
                     phone: contact.phone,
+                    important: contact.important,
                     checked: false,
-                    shown: true,
-                    number: i + 1
+                    shown: true
                 };
             });
         },
@@ -54,6 +58,7 @@ new Vue({
             this.firstName = "";
             this.lastName = "";
             this.phone = "";
+            this.important = false;
 
             this.validation = false;
         },
@@ -83,11 +88,20 @@ new Vue({
                 return;
             }
 
+            if (this.phoneExists) {
+                new bootstrap.Modal($("#telephone_exists_modal"), {}).show();
+                return;
+            }
+
             const contact = new Contact(
                 this.formatString(this.firstName, true),
                 this.formatString(this.lastName, true),
-                this.formatString(this.phone, false)
+                this.formatString(this.phone, false),
+                this.important
             );
+
+            console.log("ADD CONTACT:");
+            console.log(contact);
 
             $.ajax({
                 type: "POST",
@@ -101,12 +115,18 @@ new Vue({
                 this.serverValidation = true;
             }).always(() => {
                 this.loadData();
+                this.clearForm();
             });
+        },
 
-            this.firstName = "";
-            this.lastName = "";
-            this.phone = "";
-            this.validation = false;
+        toggleImportant(contactId) {
+            $.ajax({
+                type: "POST",
+                url: "/phonebook/toggleimportance",
+                data: JSON.stringify(contactId)
+            }).fail(() => {
+                console.log("Toggle importance failed. Possible reason: contact was deleted on server");
+            });
         },
 
         showConfirmDeleteDialog(contact) {
@@ -153,36 +173,27 @@ new Vue({
         },
 
         exportContacts() {
-            var req = new XMLHttpRequest();
-            req.open("GET", "/file.pdf", true);
+            const req = new XMLHttpRequest();
+            req.open("GET", "/phonebook/export", true);
             req.responseType = "blob";
 
-            req.onload = function (event) {
-                const blob = req.response;
+            req.onload = () => {
+                let blob = req.response;
+                blob.lastModifiedDate = new Date();
+
+                const newFile = new File([blob], "phonebook.xlsx", {
+                    lastModified: new Date().getTime(),
+                    type: blob.type
+                });
+
                 console.log(blob.size);
-                var link = document.createElement("a");
-                link.href = window.URL.createObjectURL(blob);
-                link.download = "phonebook_" + new Date() + ".xlsx";
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(newFile);
+                link.download = "phonebook.xlsx";
                 link.click();
             };
 
             req.send();
-
-            // $.ajax({
-            //     dataType: "native",
-            //     url: "/phonebook/export",
-            //     xhrFields: {
-            //         responseType: "blob"
-            //     }
-            // }).done(blob => {
-            //     console.log(blob.size);
-            //     const link = document.createElement("a");
-            //     link.href = window.URL.createObjectURL(blob);
-            //     link.download = "phonebook_" + new Date() + ".xlsx";
-            //     link.click();
-            // }).fail(()=>{
-            //     console.log("Error getting file");
-            // });
         },
 
         loadData(term) {
@@ -206,48 +217,35 @@ new Vue({
 
     computed: {
         firstNameError() {
-            if (this.firstName) {
+            // First name is required
+            if (!this.firstName) {
                 return {
-                    message: "",
-                    error: false
-                };
-            }
-
-            return {
-                message: "Please provide your first name",
-                error: true
-            };
-        },
-
-        lastNameError() {
-            if (!this.lastName) {
-                return {
-                    message: "Please provide your last name",
                     error: true
                 };
             }
 
             return {
-                message: "",
+                error: false
+            };
+        },
+
+        lastNameError() {
+            // Last name is required
+            if (!this.lastName) {
+                return {
+                    error: true
+                };
+            }
+
+            return {
                 error: false
             };
         },
 
         phoneError() {
+            // Phone is required
             if (!this.phone) {
                 return {
-                    message: "Поле Телефон должно быть заполнено.",
-                    error: true
-                };
-            }
-
-            const sameContact = this.rows.some(c => {
-                return c.phone === this.phone;
-            });
-
-            if (sameContact) {
-                return {
-                    message: "Номер телефона не должен дублировать другие номера в телефонной книге.",
                     error: true
                 };
             }
@@ -256,6 +254,12 @@ new Vue({
                 message: "",
                 error: false
             };
+        },
+
+        phoneExists() {
+            return this.rows.some(c => {
+                return c.phone === this.phone;
+            });
         },
 
         hasError() {
@@ -320,4 +324,3 @@ new Vue({
         }
     }
 });
-
