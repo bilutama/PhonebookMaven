@@ -23,7 +23,7 @@ public class ExportContactsServlet extends HttpServlet {
 
             outputStream.flush();
         } catch (Exception e) {
-            System.out.println("error in GetContactsServlet POST: ");
+            System.out.println("error in ExportContactsServlet POST: ");
             e.printStackTrace();
         }
     }
