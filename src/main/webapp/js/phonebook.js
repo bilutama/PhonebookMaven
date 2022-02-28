@@ -173,27 +173,21 @@ new Vue({
         },
 
         exportContacts() {
-            const req = new XMLHttpRequest();
-            req.open("GET", "/phonebook/export", true);
-            req.responseType = "blob";
+            $.ajax({
+                type: "GET",
+                url: "/phonebook/export",
+            }).done(response => {
+                const url = window.URL.createObjectURL(new Blob([response]));
 
-            req.onload = () => {
-                let blob = req.response;
-                blob.lastModifiedDate = new Date();
-
-                const newFile = new File([blob], "phonebook.xlsx", {
-                    lastModified: new Date().getTime(),
-                    type: blob.type
-                });
-
-                console.log(blob.size);
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(newFile);
-                link.download = "phonebook.xlsx";
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "phonebook.xlsx");
+                document.body.appendChild(link);
                 link.click();
-            };
-
-            req.send();
+                document.body.removeChild(link);
+            }).fail(ajaxRequest => {
+                console.log(ajaxRequest);
+            });
         },
 
         loadData(term) {
